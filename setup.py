@@ -1,7 +1,8 @@
-from distutils.core import setup
+import setuptools
 
-setup(
+setuptools.setup(
     name='adht',
     version='0.1',
-    py_modules=['adht'],
+    package_dir={'': 'adht'},
+    requires=[i.strip() for i in open('requirements.txt', 'r').read().split('\n') if i.strip() is not '']
 )
