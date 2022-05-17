@@ -6,15 +6,22 @@ from adht.common.peer import Peer
 
 
 class NetworkPackage:
-    def __init__(self, msg: bytes, peer: Peer):
-        self.msg = msg
+    def __init__(self, peer: Peer, msg: bytes, encoded: bool):
         self.peer = peer
+        if not encoded:
+            self.encoded_msg = self.peer.crypto.process_with_public_key(msg)
+        else:
+            self.encoded_msg = msg
 
 
 class Network:
     def __init__(self):
         self.send_queue: queue.Queue[NetworkPackage] = queue.Queue()
         self.recv_queue: queue.Queue[NetworkPackage] = queue.Queue()
+        self.send_cb = None
+
+    def register_send_cb(self, cb):
+        self.send_cb = cb
 
     def get_send_queue(self):
         return self.send_queue
@@ -23,7 +30,10 @@ class Network:
         return self.recv_queue
 
     def send(self, pkg: NetworkPackage):
-        self.get_send_queue().put(pkg)
+        if self.send_cb:
+            self.send_cb(pkg)
+        else:
+            self.get_send_queue().put(pkg)
 
     def recv(self) -> Optional[NetworkPackage]:
         try:

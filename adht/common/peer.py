@@ -1,7 +1,9 @@
+from adht.common.crypto import Crypto
+
 
 class Peer:
-    def __init__(self, address, pub_key):
+    def __init__(self, address, crypto: Crypto):
         self.address = address
-        self.pub_key = pub_key
+        self.crypto = crypto
 
 
