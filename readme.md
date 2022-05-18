@@ -20,6 +20,3 @@ install PIP
 pip3 install -r requirements.txt
 python -m pytest
 ```
-
-when using pip, make sure to turn off proxy.
-
