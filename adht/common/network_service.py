@@ -1,5 +1,4 @@
 import asyncio
-import queue
 import socket
 
 from adht.common.crypto import Crypto
@@ -23,11 +22,12 @@ class NetworkService(asyncio.DatagramProtocol):
     def datagram_received(self, data, addr) -> "Main entrypoint for processing message":
         # Here is where you would push message to whatever methods/classes you want.
         print(f"Received Syslog message: {data}")
+        decoded_data = self.crypto.process_with_private_key(data)
         if addr in self.peer_dict:
             peer = self.peer_dict[addr]
-            self.network.recv_queue.put(NetworkPackage(peer, data, True), block=True, timeout=1)
         else:
-            raise NotImplementedError(f'unknown peer: {addr}')
+            peer = Peer.unknown_peer(addr)
+        self.network.recv_queue.put(NetworkPackage(peer, decoded_data, True), block=True, timeout=1)
 
     @staticmethod
     def send_cb(packet):

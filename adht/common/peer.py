@@ -6,4 +6,6 @@ class Peer:
         self.address = address
         self.crypto = crypto
 
-
+    @staticmethod
+    def unknown_peer(address):
+        return Peer(address, Crypto(b''))
