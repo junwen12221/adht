@@ -25,19 +25,19 @@ def test_echo_network():
 def test_echo_network_service():
     port = 9123
     addr = ('127.0.0.1', port)
-    my_key_pair = Crypto(b'')
+    crypto = Crypto(b'')
     network = Network()
-    peer = Peer(addr, crypto=Crypto(b''))
+    peer = Peer(addr, crypto=crypto)
     peer_dict = {addr: peer}
 
     echo_pkg = NetworkPackage(peer, b'echo me', False)
 
     loop = asyncio.get_event_loop()
-    t = loop.create_datagram_endpoint(lambda: NetworkService(peer_dict, network, my_key_pair), local_addr=('0.0.0.0', port))
+    t = loop.create_datagram_endpoint(lambda: NetworkService(peer_dict, network, crypto), local_addr=('0.0.0.0', port))
 
     loop.run_until_complete(t)
     network.send(echo_pkg)
-    loop.run_until_complete(asyncio.sleep(3))
+    loop.run_until_complete(asyncio.sleep(10))
 
     echo_back_pkg = network.recv()
-    assert echo_pkg.encoded_msg == echo_back_pkg.encoded_msg
+    assert echo_pkg == echo_back_pkg
